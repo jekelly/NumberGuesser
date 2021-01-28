@@ -15,10 +15,16 @@ namespace NumberGuesser
                 while (true)
                 {
                     int number = r.Next(100);
+                    var userTask = TelemetryService.DefaultSession.StartUserTask("vs/guesser/guess-round");
+                    userTask.EndEvent.Properties.Add("vs.guesser.number", number);
+                    int guesses = 0;
+
                     while (true)
                     {
                         Console.WriteLine($"Guess a number between 1-100");
                         int guess = int.Parse(Console.ReadLine());
+                        guesses++;
+
                         if (guess < number)
                         {
                             Console.WriteLine("Pick a higher number");
@@ -34,11 +40,15 @@ namespace NumberGuesser
                             {
                                 break;
                             }
-
-                            TelemetryService.DefaultSession.PostEvent("vs/numberguesser/alldone");
+                            var e = new TelemetryEvent("vs/guesser/myevent");
+                            e.Properties.Add("vstelworkbench.number", 42);
+                            e.Properties.Add("vstelworkbench.string", "helloworld");
+                            TelemetryService.DefaultSession.PostEvent(e);
                             return;
                         }
                     }
+                    userTask.EndEvent.Properties.Add("vs.guesser.guesses", guesses);
+                    userTask.End(TelemetryResult.Success);
                 }
             }
         }
