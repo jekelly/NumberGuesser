@@ -36,10 +36,19 @@ namespace NumberGuesser
                         else
                         {
                             Console.WriteLine("You guessed it! Play again?");
-                            if (Console.ReadLine().ToLowerInvariant() == "y")
+
+                            try
                             {
-                                break;
+                                if (Console.ReadLine().ToLowerInvariant() == "y")
+                                {
+                                    break;
+                                }
                             }
+                            catch(Exception ex)
+                            {
+                                _ = TelemetryService.DefaultSession.PostFault("vs/guesser/input-fault", "bad inputs", ex);
+                            }
+
                             var e = new TelemetryEvent("vs/guesser/myevent");
                             e.Properties.Add("vstelworkbench.number", 42);
                             e.Properties.Add("vstelworkbench.string", "helloworld");
